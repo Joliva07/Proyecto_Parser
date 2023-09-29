@@ -42,21 +42,21 @@ void yyerror(const char *message);
 }
 
 /*token*/
-%token<strval> T_Automata_AFN_OP
-%token<strval> T_Automata_AFN_END
-%token<strval> T_alfabeto_OP
-%token<strval> T_alfabeto_END
-%token<strval> T_Estado_OP
-%token<strval> T_Estado_END
-%token<strval> T_Inicial_OP
-%token<strval> T_Inicial_END
-%token<strval> T_Final_OP
-%token<strval> T_Final_END
-%token<strval> T_Transiciones_OP
-%token<strval> T_Transiciones_END
+%token<strval> T_AUTOMATA_AFN_OP
+%token<strval> T_AUTOMATA_AFN_END
+%token<strval> T_ALFABETO_OP
+%token<strval> T_ALFABETO_END
+%token<strval> T_ESTADO_OP
+%token<strval> T_ESTADO_END
+%token<strval> T_INICIAL_OP
+%token<strval> T_INICIAL_END
+%token<strval> T_FINAL_OP
+%token<strval> T_FINAL_END
+%token<strval> T_TRANSICIONES_OP
+%token<strval> T_TRANSICIONES_END
 %token<strval> T_END_TAG
 
-%token<strval> T_Vacio
+%token<strval> T_EPSILON
 
 %token<strval> T_COMMENT_OPEN
 %token<strval> T_COMMENT_CLOSE
