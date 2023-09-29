@@ -57,25 +57,56 @@ WHITESPACE          [ \t]
 [a-zA-Z]                                        { token_print(T_STRING); yylval.strval=strdup(yytext); close_vitacora_file(); return T_STRING;}
 \'[a-zA-Z0-9_\-\.]*\'                           { token_print(T_STRING_SINGLE_QUOTE); yylval.strval=strdup(yytext);close_vitacora_file();  return T_STRING_SINGLE_QUOTE;}  
 \"[a-zA-Z0-9_\-\.]*" "[a-zA-Z0-9_\-\.]*\"       { token_print(T_STRING_DQ_SPACE); yylval.strval=strdup(yytext); close_vitacora_file(); return T_STRING_DQ_SPACE;}
-[0-9]+		                                      {token_print(T_INT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_INT;}
+[0-9]+		                                    {token_print(T_INT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_INT;}
 
-"."                                           { token_print(T_DOT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_DOT;}
-","                                           { token_print(T_COMMA); yylval.strval=strdup(yytext); close_vitacora_file(); return T_COMMA;}
-"="                                           { token_print(T_ASSIGN); yylval.strval=strdup(yytext); close_vitacora_file(); return T_ASSIGN;}
-":"                                           { token_print(T_COLON); yylval.strval=strdup(yytext); close_vitacora_file(); return T_COLON;}
-"["                                           { token_print(T_LBRACK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_LBRACK;}
-"]"                                           { token_print(T_RBRACK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_RBRACK;}
-"/"                                           { token_print(T_SLASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_SLASH;}
-"!"                                           { token_print(T_EXCLAMATION); yylval.strval=strdup(yytext); close_vitacora_file(); return T_EXCLAMATION ;}
-"-"                                           { token_print(T_DASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_DASH;}
-"{"                                           { token_print(T_LBRACES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_LBRACES;}
-"}"                                           { token_print(T_RBRACES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_RBRACES;}
-"@"                                           { token_print(T_AT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_AT;}
-"?"                                           { token_print(T_QUESTION_MARK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_QUESTION_MARK ;}
-"_"                                           { token_print(T_UNDERSCORE); yylval.strval=strdup(yytext); close_vitacora_file(); return T_UNDERSCORE;}
-"#"                                           { token_print(T_HASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_HASH;}
-"'"                                           { token_print(T_SQUOTES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_SQUOTES;}
+"."                         { token_print(T_DOT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_DOT;}
+","                         { token_print(T_COMMA); yylval.strval=strdup(yytext); close_vitacora_file(); return T_COMMA;}
+"="                         { token_print(T_ASSIGN); yylval.strval=strdup(yytext); close_vitacora_file(); return T_ASSIGN;}
+":"                         { token_print(T_COLON); yylval.strval=strdup(yytext); close_vitacora_file(); return T_COLON;}
+"["                         { token_print(T_LBRACK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_LBRACK;}
+"]"                         { token_print(T_RBRACK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_RBRACK;}
+"/"                         { token_print(T_SLASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_SLASH;}
+"!"                         { token_print(T_EXCLAMATION); yylval.strval=strdup(yytext); close_vitacora_file(); return T_EXCLAMATION ;}
+"-"                         { token_print(T_DASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_DASH;}
+"{"                         { token_print(T_LBRACES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_LBRACES;}
+"}"                         { token_print(T_RBRACES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_RBRACES;}
+"@"                         { token_print(T_AT); yylval.strval=strdup(yytext); close_vitacora_file(); return T_AT;}
+"?"                         { token_print(T_QUESTION_MARK); yylval.strval=strdup(yytext); close_vitacora_file(); return T_QUESTION_MARK ;}
+"_"                         { token_print(T_UNDERSCORE); yylval.strval=strdup(yytext); close_vitacora_file(); return T_UNDERSCORE;}
+"#"                         { token_print(T_HASH); yylval.strval=strdup(yytext); close_vitacora_file(); return T_HASH;}
+"'"                         { token_print(T_SQUOTES); yylval.strval=strdup(yytext); close_vitacora_file(); return T_SQUOTES;}
+
+[  \t]+                     {   }  
+<<EOF>>                     { token_print(T_EOF); yylval.strval=strdup(yytext); return T_EOF;}
+.                           { printf("UNRECOGNIZED_CHAR: %s\n", yytext); }
+[\n]+                       {lineno++;}
+
+"<!--"                  { BEGIN(STATE_COMMENT); str_buf_ptr = str_buf; *str_buf_ptr = '\0'; }
+<STATE_COMMENT>"-->"          { BEGIN(INITIAL); 
+                          if(strstr(str_buf, "--") != NULL) {
+                            fprintf(stderr, "Invalid comment on line %d: comment contains '--'\n", lineno);
+                            yyerror("Wrong token");
+                          } else {
+                            comment_print();
+                          }
+                        }
+<STATE_COMMENT>.|\n           { *str_buf_ptr = *yytext; str_buf_ptr++; *str_buf_ptr = '\0'; ECHO;}
 
 
 %%
+
+void token_print(){            ////////////////////// ** error 
+    if(FLEX_DEBUG && SHOW_TOKENS){
+        printf("TOKEN FOUND: %s  | LINE: %d\n", yytext,lineno);
+    }    
+}
+
+//print if comment is found 
+
+void comment_print(){            ////////////////////// ** error 
+    if(FLEX_DEBUG && SHOW_COMMENTS){
+        printf("COMMENT FOUND: %s  | LINE: %d\n", yytext,lineno);
+    }    
+}
+
 
