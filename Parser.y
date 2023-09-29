@@ -88,3 +88,26 @@ void yyerror(const char *message);
 /*EOF*/
 %token <strval> T_EOF          0           "end of file"
 
+%type <strval> uno dos
+%type programa automata_afn atr alfabeto estado inicial final transciones epsilon
+
+%%
+programa: T_AUTOMATA_AFN estado inicial final transciones T_END_AUTOMATA_AFN
+            | estado inicial final transciones;
+
+T_ALFABETO { tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("a");
+            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("b");
+            } automata_afn element T_END_ALFABETO
+            | T_ALFABETO {
+            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("a");
+            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("b");
+            } automata_afn element T_END_ALFABETO;
+
+atr: T_STRING TSTRING {
+t_alfabeto0 = strdup($1);
+t_alfabeto1 = strdup($2);
+}
+
+epsilon: T_SIMBOLO
+estado:     T_ESTADO atr T_END_ESTADO
+%%
