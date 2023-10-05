@@ -333,35 +333,54 @@ element:                  estado element
 
 %%
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
+    int choice;
     int token;
 
     /*Διάβασμα του αρχείου*/
 
-
-    if(argc > 1){
+    if (argc > 1) {
         yyin = fopen(argv[1], "r");
-        if (yyin == NULL){
-            perror ("Error opening file"); 
+        if (yyin == NULL) {
+            perror("Error opening file");
             return -1;
         }
     }
 
-    /*Κάνε συνατικτική ανάλυση*/
-    yyparse();
+    do {
+        printf("Seleccione una opción:\n");
+        printf("1. Analizar el archivo\n");
+        printf("2. Salir\n");
 
+        scanf("%d", &choice);
 
-   if(error_count > 0){
-        printf("Syntax Analysis failed due to %d errors\n", error_count);
-      }
-        
-   else{
-        printf("Syntax Analysis completed successfully.\n");
-      }
+        switch (choice) {
+            case 1:
+                /*Κάνε συνατικτική ανάλυση*/
+                yyparse();
+
+                if (error_count > 0) {
+                    printf("El análisis sintáctico falló debido a %d errores\n", error_count);
+                } else {
+                    printf("El análisis sintáctico se completó con éxito.\n");
+                }
+                break;
+
+            case 2:
+                printf("Saliendo del programa.\n");
+                break;
+
+            default:
+                printf("Opción no válida. Intente de nuevo.\n");
+                break;
+        }
+    } while (choice != 2);
+
+    if (yyin != NULL) {
+        fclose(yyin);
+    }
 
     return 0;
-    yyrestart(yyin);
-    fclose(yyin);
 }
 
 

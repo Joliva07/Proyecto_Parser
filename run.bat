@@ -1,16 +1,32 @@
 rem Bison command
-bison -d Parser.y
+rem bison -d Parser.y
 
 rem Flex command
-flex Parser.l
+rem flex Parser.l
 
 rem GCC commands
-gcc -c lex.yy.c -o lex.yy.o
-gcc -c Parser.tab.c -o Parser.tab.o
+rem gcc -c lex.yy.c -o lex.yy.o
+rem gcc -c Parser.tab.c -o Parser.tab.o
 
 rem Linking
-gcc lex.yy.o Parser.tab.o -o myParser.exe
+rem gcc lex.yy.o Parser.tab.o -o myParser.exe
 
 rem clear (comentario)
 rem Run the parser
-myParser.exe Ejemplo.xml
+rem myParser.exe Ejemplo.xml ---
+
+@echo off
+echo Compilando el programa C++...
+g++ -o Prueba.exe Prueba.cpp
+
+if errorlevel 1 (
+    echo Error al compilar el programa.
+    pause
+    exit /b 1
+)
+
+echo Programa compilado exitosamente. Ejecutando el programa...
+Prueba.exe
+
+echo Presiona Enter para salir...
+pause
