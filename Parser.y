@@ -46,7 +46,8 @@ int found_match = 0; // Bandera para indicar si se encontró una coincidencia
 void yyerror(const char *message);
 %}
 
-
+%error-verbose
+%define parse.error custom_error_handling_function
 
 %union{
    int intval;
@@ -222,7 +223,7 @@ estadoatr: T_INT T_INT {
                             }else{
                                 tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
                             }
-                         } transatr
+                         } 
                          | T_INT T_COMMA  T_EPSILON  T_COMMA  T_INT {
                             char concatenated_values[100]; 
                             sprintf(concatenated_values, "%d,%s,%d", atoi($1), $3, atoi($5));
@@ -236,7 +237,7 @@ estadoatr: T_INT T_INT {
                             }else{
                                 tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
                             }
-                         } transatr
+                         } 
                           | %empty;
                           /*
                          T_INT T_COMMA T_EPSILON T_COMMA  T_INT
@@ -366,7 +367,7 @@ int main(int argc, char *argv[]){
 
 void yyerror(const char *message)
 {
-    error_count++;
+    /* error_count++;
     
     if(flag_err_type==0){
         printf("-> ERROR at line %d caused by %s : %s\n", lineno, yytext, message);
@@ -380,5 +381,33 @@ void yyerror(const char *message)
     if(error_count == MAX_ERRORS){
         printf("Max errors (%d) detected. ABORTING...\n", MAX_ERRORS);
         exit(1);
+    }*/
+    error_count++;
+
+    // Abre el archivo en modo de escritura (creándolo si no existe).
+    if (vitacora_errores_file == NULL) {
+        vitacora_errores_file = fopen("vitacora_errores.html", "a");
+        if (vitacora_errores_file == NULL) {
+            perror("Error al abrir el archivo vitacora_errores.html");
+            exit(-1);
+        }
     }
+
+    // Escribe el error en el archivo.
+    if (flag_err_type == 0) {
+        fprintf(vitacora_errores_file, "-> ERROR at line %d caused by %s : %s\n", lineno, message);
+        printf("-> ERROR at line %d caused by %s : %s\n", lineno, message);
+    } else if (flag_err_type == 1) {
+        *str_buf_ptr = '\0'; 
+       // fprintf(vitacora_errores_file,"-> ERROR at line %d near "%s": %s\n", lineno, str_buf, message);
+        printf("-> ERROR at line %d near %s : %s\n", lineno, str_buf, message);
+    }
+
+    flag_err_type = 0;
+    if (MAX_ERRORS > 0 && error_count == MAX_ERRORS) {
+        printf("Max errors (%d) detected. ABORTING...\n", MAX_ERRORS);
+        fclose(vitacora_errores_file);
+        exit(-1);
+    }
+    fflush(vitacora_errores_file);
 }

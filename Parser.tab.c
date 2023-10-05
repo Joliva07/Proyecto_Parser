@@ -1579,7 +1579,7 @@ int main(int argc, char *argv[]){
 
 void yyerror(const char *message)
 {
-    error_count++;
+    /* error_count++;
     
     if(flag_err_type==0){
         printf("-> ERROR at line %d caused by %s : %s\n", lineno, yytext, message);
@@ -1593,5 +1593,33 @@ void yyerror(const char *message)
     if(error_count == MAX_ERRORS){
         printf("Max errors (%d) detected. ABORTING...\n", MAX_ERRORS);
         exit(1);
+    }*/
+    error_count++;
+
+    // Abre el archivo en modo de escritura (creándolo si no existe).
+    if (vitacora_errores_file == NULL) {
+        vitacora_errores_file = fopen("vitacora_errores.html", "a");
+        if (vitacora_errores_file == NULL) {
+            perror("Error al abrir el archivo vitacora_errores.html");
+            exit(-1);
+        }
     }
+
+    // Escribe el error en el archivo.
+    if (flag_err_type == 0) {
+        fprintf(vitacora_errores_file, "-> ERROR at line %d caused by %s : %s\n", lineno, message);
+        printf("-> ERROR at line %d caused by %s : %s\n", lineno, message);
+    } else if (flag_err_type == 1) {
+        *str_buf_ptr = '\0'; 
+       // fprintf(vitacora_errores_file,"-> ERROR at line %d near "%s": %s\n", lineno, str_buf, message);
+        printf("-> ERROR at line %d near %s : %s\n", lineno, str_buf, message);
+    }
+
+    flag_err_type = 0;
+    if (MAX_ERRORS > 0 && error_count == MAX_ERRORS) {
+        printf("Max errors (%d) detected. ABORTING...\n", MAX_ERRORS);
+        fclose(vitacora_errores_file);
+        exit(-1);
+    }
+    fflush(vitacora_errores_file);
 }
