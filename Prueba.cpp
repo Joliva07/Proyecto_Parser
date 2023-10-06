@@ -52,6 +52,48 @@ std::string extractFileName(const std::string& filePath) {
     return filePath;
 }
 
+void createHTMLFromTokensFile() {
+    // Abre el archivo "vitacora_tokens.html" para lectura
+    std::ifstream tokensFile("vitacora_tokens.html");
+
+    if (!tokensFile.is_open()) {
+        std::cerr << "Error: No se pudo abrir el archivo 'vitacora_tokens.html'." << std::endl;
+        return;
+    }
+
+    // Abre un nuevo archivo HTML para escritura
+    std::ofstream outputFile("output.html");
+
+    if (!outputFile.is_open()) {
+        std::cerr << "Error: No se pudo crear el archivo 'output.html'." << std::endl;
+        return;
+    }
+
+    // Agrega las etiquetas HTML iniciales al archivo de salida
+    outputFile << "<!DOCTYPE html>\n";
+    outputFile << "<html>\n";
+    outputFile << "<head>\n";
+    outputFile << "<title>Archivo HTML generado desde tokens</title>\n";
+    outputFile << "</head>\n";
+    outputFile << "<body>\n";
+
+    // Lee y copia el contenido del archivo "vitacora_tokens.html" al archivo de salida
+    std::string line;
+    while (std::getline(tokensFile, line)) {
+        outputFile << line << "\n";
+    }
+
+    // Agrega las etiquetas HTML finales al archivo de salida
+    outputFile << "</body>\n";
+    outputFile << "</html>\n";
+
+    // Cierra ambos archivos
+    tokensFile.close();
+    outputFile.close();
+
+    std::cout << "Se ha creado el archivo 'output.html' basado en 'vitacora_tokens.html'." << std::endl;
+}
+
 void createAFN() {
     // Aquí puedes agregar la lógica para crear un AFN (Automaton Finite State Network)
     // Por ahora, esta función está vacía
@@ -123,7 +165,7 @@ int main() {
 }
             case 2: {
                 // Llama a tu función para crear el AFN aquí
-                createAFN();
+                createHTMLFromTokensFile();
                 break;
             }
             case 3: {

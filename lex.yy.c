@@ -2129,25 +2129,13 @@ void yyfree (void * ptr )
 #line 100 "lexer.l"
 
 
-/*void token_print(){            ////////////////////// ** error 
-    if(FLEX_DEBUG && SHOW_TOKENS){
-        printf("TOKEN FOUND: %s  | LINE: %d\n", yytext,lineno);
-    }    
-}
 
-//print if comment is found 
-
-void comment_print(){            ////////////////////// ** error 
-    if(FLEX_DEBUG && SHOW_COMMENTS){
-        printf("COMMENT FOUND: %s  | LINE: %d\n", yytext,lineno);
-    }    
-}*/
 
 void token_print(){
     if(FLEX_DEBUG && SHOW_TOKENS){
         printf("TOKEN FOUND: %s  | LINE: %d\n", yytext, lineno);
 
-        // Abre el archivo en modo de escritura al final del archivo (creándolo si no existe).
+
         if (vitacora_tokens_file == NULL) {
             vitacora_tokens_file = fopen("vitacora_tokens.html", "a");
             if (vitacora_tokens_file == NULL) {
@@ -2156,20 +2144,20 @@ void token_print(){
             }
         }
 
-        // Escribe la línea en el archivo.
+        
         fprintf(vitacora_tokens_file, "TOKEN FOUND: %s  | LINE: %d\n", yytext, lineno);
     }
 }
-//print if comment is found 
+
 
 void close_vitacora_file() {
     if (vitacora_tokens_file != NULL) {
         fclose(vitacora_tokens_file);
-        vitacora_tokens_file = NULL;  // Establece el puntero de archivo a NULL después de cerrarlo.
+        vitacora_tokens_file = NULL;  
     }
 }
 
-void comment_print(){            ////////////////////// ** error 
+void comment_print(){             
     if(FLEX_DEBUG && SHOW_COMMENTS){
         printf("COMMENT FOUND: %s  | LINE: %d\n", yytext,lineno);
     }    

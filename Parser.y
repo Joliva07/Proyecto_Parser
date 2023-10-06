@@ -32,22 +32,22 @@ extern FILE *yyin;
 
 extern void yyterminate();
 
-/* Variables for error handling and saving */
+
 int error_count=0; 
-int flag_err_type=0; // 0: Token Error (YYTEXT) || 1: String Error (STRBUF)
+int flag_err_type=0; 
 int scope=0;
 int pos_number=0;
-int flag=0;  //flag gia to token ean einai swsto to android
+int flag=0;  
 int valueflag=0;
 char* strint;
 
-int found_match = 0; // Bandera para indicar si se encontró una coincidencia
-/*Specific Functions*/
+int found_match = 0; 
+//%error-verbose
 void yyerror(const char *message);
 %}
 
-%error-verbose
-%define parse.error custom_error_handling_function
+
+%define parse.error verbose
 
 %union{
    int intval;
@@ -73,7 +73,7 @@ void yyerror(const char *message);
 %token <strval> T_END_TAG
 
 
-%token <strval> T_EPSILON
+%token <strval> T_EPSILON    "&"
 
 %token <strval> T_COMMENT_OPEN
 %token <strval> T_COMMENT_CLOSE
@@ -108,24 +108,15 @@ void yyerror(const char *message);
 
 
 /*Non-Terminal*/
-%type alfabeto alfabetoatr estado estadoatr inicial final atributofin transciones transatr epsilon
+%type alfabeto alfabetoatr estado estadoatr inicial final atributofin transciones transatr 
 %start programa 
 %%
-//%type <strval> uno dos
-//automata_afn atr atrfn
+//epsilon
 programa: T_AUTOMATA_AFN_OP alfabeto estado inicial final transciones T_AUTOMATA_AFN_END
             | alfabeto estado inicial final transciones;
 
 alfabeto: T_ALFABETO_OP alfabetoatr T_ALFABETO_END;
  
-
-/*T_ALFABETO { tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("a");
-            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("b");
-            } automata_afn element T_END_ALFABETO
-            | T_ALFABETO {
-            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("a");
-            tokens_T_ALFABETO[num_tokens_T_ALFABETO++] = strdup("b");
-            } automata_afn element T_END_ALFABETO;*/
 
 alfabetoatr: T_STRING T_STRING {
             tokens_alfabetos[num_tokens_alfabetos++] = strdup($1);
@@ -142,11 +133,10 @@ alfabetoatr: T_STRING T_STRING {
             tokens_alfabetos[num_tokens_alfabetos++] = strdup($2);
             tokens_alfabetos[num_tokens_alfabetos++] = strdup($3);
         };
-/*t_alfabeto0 = strdup($1);
-t_alfabeto1 = strdup($2);*/
 
 
-epsilon: T_EPSILON {tokens_epsilon[num_tokens_epsilon++] = strdup("&");};
+
+
 estado:     T_ESTADO_OP estadoatr T_ESTADO_END;
 
 estadoatr: T_INT T_INT {
@@ -188,34 +178,12 @@ estadoatr: T_INT T_INT {
 
                 transatr: T_INT T_COMMA  T_STRING  T_COMMA  T_INT 
                          {
-                           /* char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($1), $3, atoi($5));
 
-                            int error_line = lineno;
-
-                             if (strcmp($3, t_alfabeto0) != 0 && strcmp($3, t_alfabeto1) != 0)
-                                {
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $3);
-                                    yyerror(error_message);
-                                }
-                            
-                            tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);*/
                             char concatenated_values[100]; 
                             sprintf(concatenated_values, "%d,%s,%d", atoi($1), $3, atoi($5));
 
                             int error_line = lineno;
-                            //arreglar el if, ya que al hacer la comparacion si uno de los valores no concuerda pero si 
-                            //esta en el vocabulario, enviara mensaje de error de todas formas
-                            /*for (int i=0; i< sizeof(tokens_alfabetos); i++){
-                                if(strcmp($3, tokens_alfabetos[i]) != 0 ||  strcmp($3, tokens_epsilon[0])){
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $3);
-                                    yyerror(error_message);
-                                }else{
-                                    tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                                }
-                            }*/
+
                             if (strcmp($3, tokens_alfabetos[0]) != 0 && strcmp($3, tokens_alfabetos[1]) != 0 && strcmp($3, tokens_alfabetos[2]) != 0 && strcmp($3, tokens_alfabetos[3]) != 0 ){
                                 char error_message[100];
                                 sprintf(error_message, "One CHARACTER at line %d does not match values %s, %s, %s or %s that were entered in ALFABETO found %s ", error_line, tokens_alfabetos[0], tokens_alfabetos[1],tokens_alfabetos[2],tokens_alfabetos[3], $3);
@@ -223,95 +191,23 @@ estadoatr: T_INT T_INT {
                             }else{
                                 tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
                             }
-                         } 
+                         } transatr
                          | T_INT T_COMMA  T_EPSILON  T_COMMA  T_INT {
                             char concatenated_values[100]; 
                             sprintf(concatenated_values, "%d,%s,%d", atoi($1), $3, atoi($5));
 
                             int error_line = lineno;
 
-                            if (strcmp($3, tokens_epsilon[0]) != 0){
-                                char error_message[100];
-                                sprintf(error_message, "One CHARACTER at line %d does not match values %s that were entered in ALFABETO found %s ", error_line, tokens_epsilon[0], $3);
-                                yyerror(error_message);
-                            }else{
+                          //  if (strcmp($3, tokens_epsilon[0]) != 0){
+                         //       char error_message[100];
+                           //     sprintf(error_message, "One CHARACTER at line %d does not match values %s that were entered in ALFABETO found %s ", error_line, tokens_epsilon[0], $3);
+                         //       yyerror(error_message);
+                           // }else{
                                 tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                            }
-                         } 
-                          | %empty;
-                          /*
-                         T_INT T_COMMA T_EPSILON T_COMMA  T_INT
-                         {
-                            char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($7), $9, atoi($11));
-
-                            tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                         }
-
-                         T_INT T_COMMA  T_STRING T_COMMA  T_INT
-                         {
-                            char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($13), $15, atoi($17));
-
-                             int error_line = lineno;
-
-                             if (strcmp($15, t_alfabeto0) != 0 && strcmp($15, t_alfabeto1) != 0)
-                                {
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $14);
-                                    yyerror(error_message);
-                                }
-
-                            tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                         }
+                           // }
+                         } transatr;
                           
-                         T_INT T_COMMA  T_STRING T_COMMA  T_INT
-                         {
-                            char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($19), $21, atoi($23));
-
-                             int error_line = lineno;
-
-                             if (strcmp($21, t_alfabeto0) != 0 && strcmp($21, t_alfabeto1) != 0)
-                                {
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $20);
-                                    yyerror(error_message);
-                                }
-                                tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                         }
-                          
-                         T_INT T_COMMA  T_STRING T_COMMA  T_INT
-                         {
-                            char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($25), $27, atoi($29));
-
-                             int error_line = lineno;
-
-                             if (strcmp($27, t_alfabeto0) != 0 && strcmp($27, t_alfabeto1) != 0)
-                                {
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $26);
-                                    yyerror(error_message);
-                                }
-                                tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                         }
-                        
-                         T_INT T_COMMA  T_STRING T_COMMA  T_INT
-                         {
-                            char concatenated_values[100]; 
-                            sprintf(concatenated_values, "%d,%s,%d", atoi($31), $33, atoi($35));
-
-                             int error_line = lineno;
-
-                             if (strcmp($33, t_alfabeto0) != 0 && strcmp($33, t_alfabeto1) != 0)
-                                {
-                                    char error_message[100];
-                                    sprintf(error_message, "Un caracter en la l�nea %d no coincide con los valores %s o %s que se introdujeron en ALFABETO encontrado %s", error_line, t_alfabeto0, t_alfabeto1, $32);
-                                    yyerror(error_message);
-                                }
-                                tokens_transicional[num_tokens_transicional++] = strdup(concatenated_values);
-                         };*/
+//epsilon: T_EPSILON {tokens_epsilon[num_tokens_epsilon++] = strdup("&");};
 
                          comment:                 T_COMMENT_OPEN T_STRING T_COMMENT_CLOSE
                           ;
@@ -337,7 +233,6 @@ int main(int argc, char *argv[]) {
     int choice;
     int token;
 
-    /*Διάβασμα του αρχείου*/
 
     if (argc > 1) {
         yyin = fopen(argv[1], "r");
@@ -346,8 +241,8 @@ int main(int argc, char *argv[]) {
             return -1;
         }
     }
-
-    do {
+yyparse();
+    /*do {
         printf("Seleccione una opción:\n");
         printf("1. Analizar el archivo\n");
         printf("2. Salir\n");
@@ -356,8 +251,8 @@ int main(int argc, char *argv[]) {
 
         switch (choice) {
             case 1:
-                /*Κάνε συνατικτική ανάλυση*/
-                yyparse();
+
+                
 
                 if (error_count > 0) {
                     printf("El análisis sintáctico falló debido a %d errores\n", error_count);
@@ -374,7 +269,7 @@ int main(int argc, char *argv[]) {
                 printf("Opción no válida. Intente de nuevo.\n");
                 break;
         }
-    } while (choice != 2);
+    } while (choice != 2);*/
 
     if (yyin != NULL) {
         fclose(yyin);
@@ -386,24 +281,9 @@ int main(int argc, char *argv[]) {
 
 void yyerror(const char *message)
 {
-    /* error_count++;
-    
-    if(flag_err_type==0){
-        printf("-> ERROR at line %d caused by %s : %s\n", lineno, yytext, message);
-    }else if(flag_err_type==1){
-        *str_buf_ptr = '\0'; 
-        printf("-> ERROR at line %d near \"%s\": %s\n", lineno, str_buf, message);
-    }
-
-    flag_err_type = 0; 
-    if(MAX_ERRORS <= 0) return;
-    if(error_count == MAX_ERRORS){
-        printf("Max errors (%d) detected. ABORTING...\n", MAX_ERRORS);
-        exit(1);
-    }*/
     error_count++;
 
-    // Abre el archivo en modo de escritura (creándolo si no existe).
+
     if (vitacora_errores_file == NULL) {
         vitacora_errores_file = fopen("vitacora_errores.html", "a");
         if (vitacora_errores_file == NULL) {
@@ -412,13 +292,13 @@ void yyerror(const char *message)
         }
     }
 
-    // Escribe el error en el archivo.
+
     if (flag_err_type == 0) {
         fprintf(vitacora_errores_file, "-> ERROR at line %d caused by %s : %s\n", lineno, message);
         printf("-> ERROR at line %d caused by %s : %s\n", lineno, message);
     } else if (flag_err_type == 1) {
         *str_buf_ptr = '\0'; 
-       // fprintf(vitacora_errores_file,"-> ERROR at line %d near "%s": %s\n", lineno, str_buf, message);
+
         printf("-> ERROR at line %d near %s : %s\n", lineno, str_buf, message);
     }
 

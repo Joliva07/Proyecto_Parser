@@ -10,6 +10,8 @@
 
 ::rem Linking
 ::rem gcc lex.yy.o Parser.tab.o -o myParser.exe
+::rem Limpiar la bitácora de tokens
+echo. > vitacora_tokens.html
 
 ::rem Solicitar al usuario la ruta del archivo XML a ejecutar
 set /p xmlFilePath=Ingrese la ruta del archivo XML que desea ejecutar: 

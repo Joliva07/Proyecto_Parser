@@ -68,7 +68,7 @@ extern int yydebug;
     T_TRANSICIONES_END = 269,      /* T_TRANSICIONES_END  */
     T_INT = 270,                   /* T_INT  */
     T_END_TAG = 271,               /* T_END_TAG  */
-    T_EPSILON = 272,               /* T_EPSILON  */
+    T_EPSILON = 272,               /* "&"  */
     T_COMMENT_OPEN = 273,          /* T_COMMENT_OPEN  */
     T_COMMENT_CLOSE = 274,         /* T_COMMENT_CLOSE  */
     T_STRING = 275,                /* T_STRING  */
@@ -100,7 +100,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 51 "Parser.y"
+#line 52 "Parser.y"
 
    int intval;
    float floatval;
